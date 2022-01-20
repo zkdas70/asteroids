@@ -7,6 +7,14 @@ pygame.init()
 SIZE = WIDTH, HEIGHT = 1000, 1000
 screen = pygame.display.set_mode(SIZE)
 FPS = 50
+IS_DONT_TOUCH_IT = False
+with open('data/seve', encoding='utf-8') as f_in:
+    values = []
+    for number, line in enumerate(f_in):
+        values.append(str(line).replace('\n', ''))
+    if values == ['True']:
+        IS_DONT_TOUCH_IT = True
+    f_in.close()
 
 
 def load_image(name, colorkey=None):
@@ -153,9 +161,11 @@ class Player(pygame.sprite.Sprite):
         if tiles == ['pc']:
             hint('компьютер', ['для взаимодействия нажми "E"'])
         elif tiles == ['bt']:
-            hint('кнопка', ['для взаимодействия нажми "E"'])
+            if IS_DONT_TOUCH_IT:
+                hint('кнопка', ['для выхода из игры нажми нажми "E"'])
+            else:
+                hint('кнопка', ['для взаимодействия нажми "E"'])
         elif tiles == ['Ps']:
-            print(1)
             hint('старшип', ['для взаимодействия нажми "E"'])
         for event in events:
             if event.type == pygame.KEYDOWN:
@@ -163,16 +173,19 @@ class Player(pygame.sprite.Sprite):
                     if tiles == ['pc']:
                         print('game of live')
                     elif tiles == ['bt']:
-                        print('ec')
+                        with open('data/seve', 'w', encoding='utf-8') as f_out:
+                            print(True, file=f_out)
+                            f_out.close()
+                        terminate()
                     elif tiles == ['Ps']:
                         print('ec')
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     player.move(0, -1)
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     player.move(0, 1)
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.move(-1, 0)
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.move(1, 0)
 
 
@@ -196,7 +209,7 @@ class Camera:
 
 if __name__ == '__main__':
     BACK = pygame.Color('black ')
-    pygame.display.set_caption('Перемещение героя. Новый уровень')
+    pygame.display.set_caption('Астероиды')
     clock = pygame.time.Clock()
     start_screen()
     WALL_TILES = ('W4',)
@@ -241,10 +254,8 @@ if __name__ == '__main__':
         for event in events:
             if event.type == pygame.QUIT:
                 running = False
-        # изменяем ракурс камеры
-        camera.update(player)
-        # обновляем положение всех спрайтов
-        for sprite in all_sprites:
+        camera.update(player)  # изменяем ракурс камеры
+        for sprite in all_sprites:  # обновляем положение всех спрайтов
             camera.apply(sprite)
         pygame.display.flip()
         clock.tick(FPS)
