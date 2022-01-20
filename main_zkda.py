@@ -4,9 +4,11 @@ import pygame
 from collections import Counter
 
 pygame.init()
-SIZE = WIDTH, HEIGHT = 1000, 1000
+infos = pygame.display.Info()
+screen_size = (infos.current_w, infos.current_h)
+SIZE = WIDTH, HEIGHT = screen_size
 screen = pygame.display.set_mode(SIZE)
-FPS = 50
+FPS = 60
 IS_DONT_TOUCH_IT = False
 with open('data/seve', encoding='utf-8') as f_in:
     values = []
@@ -15,6 +17,76 @@ with open('data/seve', encoding='utf-8') as f_in:
     if values == ['True']:
         IS_DONT_TOUCH_IT = True
     f_in.close()
+
+
+def komp():
+    import random
+
+    class Ball(pygame.sprite.Sprite):
+        def __init__(self, radius, ):
+            x = random.randint(50, height - 50)
+            y = random.randint(50, width - 50)
+            super().__init__(all_sprites)
+            self.radius = radius
+            self.image = pygame.Surface((2 * radius, 2 * radius),
+                                        pygame.SRCALPHA, 32)
+            pygame.draw.circle(self.image, pygame.Color((0, random.randint(100, 255), 0)),
+                               (radius, radius), radius)
+            self.rect = pygame.Rect(x, y, 2 * radius, 2 * radius)
+            self.vx = random.randint(-5, 5)
+            self.vy = random.randrange(-5, 5)
+
+        def update(self):
+            self.rect = self.rect.move(self.vx, self.vy)
+            if pygame.sprite.spritecollideany(self, horizontal_borders):
+                self.vy = -self.vy
+            if pygame.sprite.spritecollideany(self, vertical_borders):
+                self.vx = -self.vx
+
+    class Border(pygame.sprite.Sprite):
+        def __init__(self, x1, y1, x2, y2):
+            super().__init__(all_sprites)
+            if x1 == x2:  # вертикальная стенка
+                self.add(vertical_borders)
+                self.image = pygame.Surface([1, y2 - y1])
+                self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
+            else:  # горизонтальная стенка
+                self.add(horizontal_borders)
+                self.image = pygame.Surface([x2 - x1, 1])
+                self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
+
+    FPS = 30
+    size = width, height = WIDTH, HEIGHT
+    pygame.init()
+    screen = pygame.display.set_mode(size)
+    all_sprites = pygame.sprite.Group()
+    horizontal_borders = pygame.sprite.Group()
+    vertical_borders = pygame.sprite.Group()
+    bak_color = pygame.Color('black')
+    clock = pygame.time.Clock()
+    running = True
+    Border(5, 5, width - 5, 5)
+    Border(5, height - 5, width - 5, height - 5)
+    Border(5, 5, 5, height - 5)
+    Border(width - 5, 5, width - 5, height - 5)
+    for i in range(10):
+        Ball(20)
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                running = False
+                break
+        screen.fill(bak_color)
+        all_sprites.draw(screen)
+        hint('КАК ВЫЙТИ?', ['нажмите любую кнопку'], [(29, 153, 50), (26, 102, 38)])
+        all_sprites.update()
+        pygame.display.flip()
+        clock.tick(FPS)
+    FPS = 60
 
 
 def load_image(name, colorkey=None):
@@ -33,16 +105,78 @@ def load_image(name, colorkey=None):
     return image
 
 
+def terminate_animation():
+    FPS = 15
+    size = WIDTH, HEIGHT
+    pygame.init()
+    screen = pygame.display.set_mode(size)
+    BACK_COLOR = pygame.Color('black')
+
+    class AnimatedSprite(pygame.sprite.Sprite):
+        def __init__(self, x, y, sheet, columns, rows, paddings=(0, 0, 0, 0), count_frames=None):
+            super().__init__(all_sprites)
+            self.frames = []
+            if count_frames is not None:
+                self.count_frames = count_frames
+            else:
+                self.count_frames = columns * rows
+            self.cut_sheet(sheet, columns, rows, paddings)
+            self.cur_frame = 0
+            self.image = self.frames[self.cur_frame]
+            self.rect = self.rect.move(x, y)
+
+        def cut_sheet(self, sheet, columns, rows, paddings):
+            self.rect = pygame.Rect(0, 0, (sheet.get_width() - paddings[1] - paddings[3]) // columns,
+                                    (sheet.get_height() - paddings[0] - paddings[2]) // rows)
+            for j in range(rows):
+                for i in range(columns):
+                    frame_location = (paddings[3] + self.rect.w * i, paddings[0] + self.rect.h * j)
+                    self.frames.append(sheet.subsurface(pygame.Rect(
+                        frame_location, self.rect.size)))
+                    if len(self.frames) == self.count_frames:
+                        break
+
+        def update(self):
+            self.cur_frame = (self.cur_frame + 1) % self.count_frames
+            self.image = self.frames[self.cur_frame]
+
+    class Boom(AnimatedSprite):
+        img = load_image('boom.png')
+        sheet = pygame.transform.scale(img, (WIDTH * 8, HEIGHT * 8))
+
+        def __init__(self, x, y):
+            super().__init__(x, y, self.__class__.sheet, 8, 8,
+                             count_frames=41)
+
+    if __name__ == '__main__':
+        pygame.display.set_caption('Взрыв')
+        clock = pygame.time.Clock()
+        all_sprites = pygame.sprite.Group()
+        Boom(20, 20)
+        for _ in range(40):
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    break
+            screen.fill(BACK_COLOR)
+            all_sprites.update()
+            all_sprites.draw(screen)
+            pygame.display.flip()
+            clock.tick(FPS)
+    FPS = 60
+
+
 def terminate():
+    terminate_animation()
     pygame.quit()
     sys.exit()
 
 
 def start_screen():
     intro_text = ["ЗАСТАВКА", "",
-                  "Правила игры",
-                  "Если в правилах несколько строк,",
-                  "приходится выводить их построчно"]
+                  "",
+                  "",
+                  "чтобы сбросить 'save' нажмите 'DELETE'"]
 
     fon = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
@@ -61,14 +195,21 @@ def start_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DELETE:
+                    IS_DONT_TOUCH_IT = False
+                    with open('data/seve', 'w', encoding='utf-8') as f_out:
+                        print(False, file=f_out)
+                        f_out.close()
+                else:
+                    return  # начинаем игру
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 return  # начинаем игру
         pygame.display.flip()
         clock.tick(FPS)
 
 
-def hint(title, text):
+def hint(title, text, colors=['Black', 'white']):
     intro_text = [title, ''] + text
 
     def text_drow(text_coord, color):
@@ -82,8 +223,8 @@ def hint(title, text):
             text_coord += intro_rect.height
             screen.blit(string_rendered, intro_rect)
 
-    text_drow(50, 'Black')
-    text_drow(52, 'white')
+    text_drow(50, colors[0])
+    text_drow(52, colors[1])
 
 
 def load_level(filename):
@@ -171,7 +312,7 @@ class Player(pygame.sprite.Sprite):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_e:
                     if tiles == ['pc']:
-                        print('game of live')
+                        komp()
                     elif tiles == ['bt']:
                         with open('data/seve', 'w', encoding='utf-8') as f_out:
                             print(True, file=f_out)
