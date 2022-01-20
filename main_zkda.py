@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame
+from collections import Counter
 
 pygame.init()
 size = WIDTH, HEIGHT = 1000, 1000
@@ -40,7 +41,6 @@ def start_screen():
     font = pygame.font.Font(None, 30)
     text_coord = 50
     for line in intro_text:
-        print(line)
         string_rendered = font.render(line, True, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
@@ -58,6 +58,24 @@ def start_screen():
                 return  # начинаем игру
         pygame.display.flip()
         clock.tick(FPS)
+
+
+def hint(title, text):
+    intro_text = [title, ''] + text
+
+    def text_drow(text_coord, color):
+        font = pygame.font.Font(None, 30)
+        for line in intro_text:
+            string_rendered = font.render(line, True, pygame.Color(color))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+
+    text_drow(50, 'Black')
+    text_drow(52, 'white')
 
 
 def load_level(filename):
@@ -116,8 +134,23 @@ class Player(pygame.sprite.Sprite):
             self.rect.move_ip(dx * tile_width, dy * tile_height)
 
     def update(self, events):
+        tiles = [
+            self.level[self.y - 1][self.x - 1], self.level[self.y - 1][self.x], self.level[self.y - 1][self.x + 1],
+            self.level[self.y][self.x - 1], self.level[self.y][self.x], self.level[self.y][self.x + 1],
+            self.level[self.y + 1][self.x - 1], self.level[self.y + 1][self.x], self.level[self.y + 1][self.x + 1],
+        ]
+        tiles = list((Counter(SPECIAL_TILES) & Counter(tiles)))
+        if tiles == ['pc']:
+            hint('компьютер', ['для взаимодействия нажми "E"'])
+        elif tiles == ['bt']:
+            hint('кнопка', ['для взаимодействия нажми "E"'])
         for event in events:
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    if tiles == ['pc']:
+                        print('game of live')
+                    elif tiles == ['bt']:
+                        print('ec')
                 if event.key == pygame.K_UP:
                     player.move(0, -1)
                 elif event.key == pygame.K_DOWN:
@@ -182,6 +215,7 @@ if __name__ == '__main__':
     player, level_x, level_y = generate_level(load_level('levelex.txt'))
     running = True
     while running:
+        screen.fill((112, 146, 191))
         events = pygame.event.get()
         player.update(events)
         for event in events:
@@ -192,8 +226,6 @@ if __name__ == '__main__':
         # обновляем положение всех спрайтов
         for sprite in all_sprites:
             camera.apply(sprite)
-
-        screen.fill(BACK)
         tiles_group.draw(screen)
         player_group.draw(screen)
         pygame.display.flip()
