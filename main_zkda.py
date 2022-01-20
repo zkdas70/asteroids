@@ -102,6 +102,16 @@ def generate_level(level):
             elif level[y][x] == PLAYER_TILE:
                 Tile('PP', x, y)
                 new_player = Player(level, x, y)
+            elif level[y][x] == 'PS':
+                Tile('P1', x, y)
+                starship = pygame.sprite.Sprite()
+                starship.image = load_image('Starship.png')
+                starship.rect = starship.image.get_rect()
+                all_sprites.add(starship)
+                starship_group.add(starship)
+                print(x, y)
+                starship.rect.x = x * tile_width
+                starship.rect.y = y * tile_height
             else:
                 Tile('ERROR', x, y)
     return new_player, len(level), len(level[y])
@@ -139,17 +149,22 @@ class Player(pygame.sprite.Sprite):
             self.level[self.y][self.x - 1], self.level[self.y][self.x], self.level[self.y][self.x + 1],
             self.level[self.y + 1][self.x - 1], self.level[self.y + 1][self.x], self.level[self.y + 1][self.x + 1],
         ]
-        tiles = list((Counter(SPECIAL_TILES) & Counter(tiles)))
+        tiles = list((Counter(list(SPECIAL_TILES)) & Counter(tiles)))
         if tiles == ['pc']:
             hint('компьютер', ['для взаимодействия нажми "E"'])
         elif tiles == ['bt']:
             hint('кнопка', ['для взаимодействия нажми "E"'])
+        elif tiles == ['Ps']:
+            print(1)
+            hint('старшип', ['для взаимодействия нажми "E"'])
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_e:
                     if tiles == ['pc']:
                         print('game of live')
                     elif tiles == ['bt']:
+                        print('ec')
+                    elif tiles == ['Ps']:
                         print('ec')
                 if event.key == pygame.K_UP:
                     player.move(0, -1)
@@ -186,11 +201,12 @@ if __name__ == '__main__':
     start_screen()
     WALL_TILES = ('W4',)
     FLOOR_TILES = ('PP', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'PX',)
-    SPECIAL_TILES = ('pc', 'bt',)
+    SPECIAL_TILES = ('pc', 'bt', 'Ps')
     PLAYER_TILE = 'P@'
     tile_images = {
         'W4': load_image('woll4.jpg'),
         'PP': load_image('pol.jpg'),
+        'Ps': load_image('pol.jpg'),
         'P1': load_image('pol1.jpg'),
         'P2': load_image('pol2.jpg'),
         'P3': load_image('pol3.jpg'),
@@ -212,11 +228,15 @@ if __name__ == '__main__':
     all_sprites = pygame.sprite.Group()
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
+    starship_group = pygame.sprite.Group()
     player, level_x, level_y = generate_level(load_level('levelex.txt'))
     running = True
     while running:
         screen.fill((112, 146, 191))
         events = pygame.event.get()
+        tiles_group.draw(screen)
+        player_group.draw(screen)
+        starship_group.draw(screen)
         player.update(events)
         for event in events:
             if event.type == pygame.QUIT:
@@ -226,8 +246,6 @@ if __name__ == '__main__':
         # обновляем положение всех спрайтов
         for sprite in all_sprites:
             camera.apply(sprite)
-        tiles_group.draw(screen)
-        player_group.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
     terminate()
