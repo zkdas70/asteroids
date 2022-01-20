@@ -4,8 +4,8 @@ import pygame
 from collections import Counter
 
 pygame.init()
-size = WIDTH, HEIGHT = 1000, 1000
-screen = pygame.display.set_mode(size)
+SIZE = WIDTH, HEIGHT = 1000, 1000
+screen = pygame.display.set_mode(SIZE)
 FPS = 50
 
 
