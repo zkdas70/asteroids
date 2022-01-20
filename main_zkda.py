@@ -130,6 +130,8 @@ class Player(pygame.sprite.Sprite):
 
 class Camera:
     def __init__(self):  # зададим начальный сдвиг камеры
+        self.target_fin_x = 0
+        self.target_fin_y = 0
         self.dx = 0
         self.dy = 0
 
@@ -138,8 +140,10 @@ class Camera:
         obj.rect.y += self.dy
 
     def update(self, target):  # позиционировать камеру на объекте target
-        self.dx = -(target.rect.x + target.rect.w // 2 - WIDTH // 2)
-        self.dy = -(target.rect.y + target.rect.h // 2 - HEIGHT // 2)
+        self.target_fin_x = -(target.rect.x + target.rect.w // 2 - WIDTH // 2)
+        self.target_fin_y = -(target.rect.y + target.rect.h // 2 - HEIGHT // 2)
+        self.dx = int(self.target_fin_x * 0.05)
+        self.dy = int(self.target_fin_y * 0.05)
 
 
 if __name__ == '__main__':
