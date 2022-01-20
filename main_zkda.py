@@ -235,7 +235,7 @@ if __name__ == '__main__':
         'ERROR': load_image('ERROR.jpg'),
     }
     tile_width = tile_height = 60
-    player_image = load_image('mario.png')
+    player_image = load_image('avatar.png')
     player = None
     camera = Camera()
     all_sprites = pygame.sprite.Group()
