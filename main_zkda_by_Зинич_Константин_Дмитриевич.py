@@ -1,17 +1,15 @@
 import os
 import sys
 import pygame
-from collections import Counter
-import mini_game_by_Глеб_Валеахметов_Русланович
-import mini_game_by_Зинич_Константин_Дмитриевич
-import animatioms_by_Глеб_Валеахметов_Русланович
+
 import animatioms_by_Зинич_Константин_Дмитриевич
 
 pygame.init()
-infos = pygame.display.Info()
-screen_size = (infos.current_w, infos.current_h)
-SIZE = WIDTH, HEIGHT = screen_size
-screen = pygame.display.set_mode(SIZE)
+from collections import Counter
+import mini_game_by_Глеб_Валеахметов_Русланович
+import mini_game_by_Зинич_Константин_Дмитриевич
+from basic_functions_by_Зинич_Константин_Дмитриевич import *
+
 FPS = 60
 IS_DONT_TOUCH_IT = False
 with open('data/seve', encoding='utf-8') as f_in:
@@ -93,28 +91,6 @@ def komp():
     FPS = 60
 
 
-def load_image(name, colorkey=None):
-    fullname = os.path.join(r'data', 'sprites', name)
-    if not os.path.isfile(fullname):  # если файл не существует, то выходим
-        print(f"Файл с изображением '{fullname}' не найден")
-        terminate()
-    image = pygame.image.load(fullname)
-    if colorkey is not None:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
-    return image
-
-
-def terminate():
-    animatioms_by_Зинич_Константин_Дмитриевич.amimatioms.terminate_animation()
-    pygame.quit()
-    sys.exit()
-
-
 def start_screen():
     intro_text = ["ЗАСТАВКА", "",
                   "",
@@ -150,24 +126,6 @@ def start_screen():
                 return  # начинаем игру
         pygame.display.flip()
         clock.tick(FPS)
-
-
-def hint(title, text, colors=['Black', 'white']):
-    intro_text = [title, ''] + text
-
-    def text_drow(text_coord, color):
-        font = pygame.font.Font(None, 30)
-        for line in intro_text:
-            string_rendered = font.render(line, True, pygame.Color(color))
-            intro_rect = string_rendered.get_rect()
-            text_coord += 10
-            intro_rect.top = text_coord
-            intro_rect.x = 10
-            text_coord += intro_rect.height
-            screen.blit(string_rendered, intro_rect)
-
-    text_drow(50, colors[0])
-    text_drow(52, colors[1])
 
 
 def load_level(filename):
@@ -262,7 +220,7 @@ class Player(pygame.sprite.Sprite):
                             f_out.close()
                         terminate()
                     elif tiles == ['Ps']:
-                        mini_game_by_Глеб_Валеахметов_Русланович.mimi_games.asteroids_clasic()
+                        mini_game_by_Глеб_Валеахметов_Русланович.asteroids_clasic()
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     player.move(0, -1)
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
