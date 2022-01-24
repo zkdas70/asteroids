@@ -65,3 +65,5 @@ class amimatioms():
                 pygame.display.flip()
                 clock.tick(FPS)
         FPS = 60
+
+amimatioms.terminate_animation()

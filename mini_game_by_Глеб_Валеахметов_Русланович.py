@@ -11,7 +11,7 @@ class mimi_games():
     def __init__(self):
         pass
 
-    def asteroids_clasic(self):
+    def asteroids_clasic(*self):
         tk = Tk()
         pygame.init()
         infos = pygame.display.Info()
