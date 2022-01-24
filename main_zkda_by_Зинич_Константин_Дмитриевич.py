@@ -2,6 +2,10 @@ import os
 import sys
 import pygame
 from collections import Counter
+import mini_game_by_Глеб_Валеахметов_Русланович
+import mini_game_by_Зинич_Константин_Дмитриевич
+import animatioms_by_Глеб_Валеахметов_Русланович
+import animatioms_by_Зинич_Константин_Дмитриевич
 
 pygame.init()
 infos = pygame.display.Info()
@@ -89,175 +93,6 @@ def komp():
     FPS = 60
 
 
-def spase():  # начало  Глеба Валеахметова Руслановича
-    import pygame
-    import random
-    import sys
-    from tkinter import Tk
-    from random import randrange as rnd
-
-    tk = Tk()
-    SIZE = WIDTH, HEIGHT
-    FPS = 60
-    STARS_COUNT = 300
-    METEORIT_COUNT = 10
-    star_list = []
-    pygame.display.set_caption('Beta test')
-    meteorit = pygame.image.load('meteorit.png')
-    object = pygame.image.load('earth.png')
-    space = pygame.image.load('spaceship.png')
-    projectile = pygame.image.load('piu.png')
-    projectile = pygame.transform.rotate(projectile, 270)
-
-    # Задаем цвета
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-
-    # Создаем игру и окно
-    pygame.init()
-    pygame.mixer.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    clock = pygame.time.Clock()
-
-    class Player(pygame.sprite.Sprite):
-        def __init__(self):
-            pygame.sprite.Sprite.__init__(self)
-            self.image = space
-            self.rect = self.image.get_rect()
-            self.rect.centerx = WIDTH / 2
-            self.rect.bottom = HEIGHT - 10
-            self.speedx = 0
-            self.speedy = 0
-
-        def update(self):
-            self.speedx = 0
-            self.speedy = 0
-            keystate = pygame.key.get_pressed()
-            if keystate[pygame.K_a]:
-                self.speedx = -8
-            if keystate[pygame.K_d]:
-                self.speedx = 8
-            if keystate[pygame.K_s]:
-                self.speedy = 8
-            if keystate[pygame.K_w]:
-                self.speedy = -8
-            self.rect.x += self.speedx
-            self.rect.y += self.speedy
-            if self.rect.right > WIDTH + 60:
-                self.rect.right = WIDTH + 60
-            if self.rect.left < -60:
-                self.rect.left = -60
-            if self.rect.top < HEIGHT - 400:
-                self.rect.top = HEIGHT - 400
-            if self.rect.bottom > HEIGHT:
-                self.rect.bottom = HEIGHT
-
-        def shoot(self):
-            bullet = Bullet(self.rect.centerx, self.rect.top)
-            all_sprites.add(bullet)
-            bullets.add(bullet)
-
-    class Star:
-        def __init__(self):
-            self.x = rnd(WIDTH)
-            self.y = rnd(HEIGHT)
-            self.s_color = (255, 255, 255)
-
-        def draw(self):
-            pygame.draw.circle(screen, self.s_color, [self.x, self.y], 2)
-
-    class Mob(pygame.sprite.Sprite):
-        def __init__(self):
-            pygame.sprite.Sprite.__init__(self)
-            self.image = meteorit
-            self.rect = self.image.get_rect()
-            self.rect.x = random.randrange(WIDTH)
-            self.rect.y = random.randrange(-100, -40)
-            self.speedy = random.randrange(1, 3)
-            self.speedx = random.randrange(-2, 2)
-
-        def update(self):
-            self.rect.x += self.speedx
-            self.rect.y += self.speedy
-            if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
-                self.rect.x = random.randrange(WIDTH - self.rect.width)
-                self.rect.y = random.randrange(-100, -40)
-                self.speedy = random.randrange(1, 8)
-
-    class Bullet(pygame.sprite.Sprite):
-        def __init__(self, x, y):
-            pygame.sprite.Sprite.__init__(self)
-            self.image = projectile
-            self.rect = self.image.get_rect()
-            self.rect.bottom = y
-            self.rect.centerx = x
-            self.speedy = -10
-
-        def update(self):
-            self.rect.y += self.speedy
-            # убить, если он заходит за верхнюю часть экрана
-            if self.rect.bottom < 0:
-                self.kill()
-
-    all_sprites = pygame.sprite.Group()
-    mobs = pygame.sprite.Group()
-    bullets = pygame.sprite.Group()
-    player = Player()
-    all_sprites.add(player)
-    for _ in range(METEORIT_COUNT):
-        m = Mob()
-        all_sprites.add(m)
-        mobs.add(m)
-
-    for _ in range(STARS_COUNT):
-        star_list.append(Star())
-
-    # Цикл игры
-    running = True
-    while running:
-        # Держим цикл на правильной скорости
-        clock.tick(FPS)
-        # Ввод процесса (события)
-        for event in pygame.event.get():
-            # проверка для закрытия окна
-            if event.type == pygame.QUIT:
-                running = False
-                terminate()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    player.shoot()
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-
-        # Обновление
-        all_sprites.update()
-
-        hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
-        for hit in hits:
-            m = Mob()
-            all_sprites.add(m)
-            mobs.add(m)
-
-        # Проверка, не ударил ли моб игрока
-        hits = pygame.sprite.spritecollide(player, mobs, False)
-        if hits:
-            running = False
-
-        # Рендеринг
-        screen.fill(BLACK)
-        for st in star_list:
-            st.draw()
-        screen.blit(object, (WIDTH // 2 - 320, HEIGHT // 1.3))
-        all_sprites.draw(screen)
-        # После отрисовки всего, переворачиваем экран
-        pygame.display.flip()
-
-    # pygame.quit()
-
-
-# конец  Глеба Валеахметова Руслановича
-
-
 def load_image(name, colorkey=None):
     fullname = os.path.join(r'data', 'sprites', name)
     if not os.path.isfile(fullname):  # если файл не существует, то выходим
@@ -274,69 +109,8 @@ def load_image(name, colorkey=None):
     return image
 
 
-def terminate_animation():
-    FPS = 15
-    size = WIDTH, HEIGHT
-    pygame.init()
-    screen = pygame.display.set_mode(size)
-    BACK_COLOR = pygame.Color('black')
-
-    class AnimatedSprite(pygame.sprite.Sprite):
-        def __init__(self, x, y, sheet, columns, rows, paddings=(0, 0, 0, 0), count_frames=None):
-            super().__init__(all_sprites)
-            self.frames = []
-            if count_frames is not None:
-                self.count_frames = count_frames
-            else:
-                self.count_frames = columns * rows
-            self.cut_sheet(sheet, columns, rows, paddings)
-            self.cur_frame = 0
-            self.image = self.frames[self.cur_frame]
-            self.rect = self.rect.move(x, y)
-
-        def cut_sheet(self, sheet, columns, rows, paddings):
-            self.rect = pygame.Rect(0, 0, (sheet.get_width() - paddings[1] - paddings[3]) // columns,
-                                    (sheet.get_height() - paddings[0] - paddings[2]) // rows)
-            for j in range(rows):
-                for i in range(columns):
-                    frame_location = (paddings[3] + self.rect.w * i, paddings[0] + self.rect.h * j)
-                    self.frames.append(sheet.subsurface(pygame.Rect(
-                        frame_location, self.rect.size)))
-                    if len(self.frames) == self.count_frames:
-                        break
-
-        def update(self):
-            self.cur_frame = (self.cur_frame + 1) % self.count_frames
-            self.image = self.frames[self.cur_frame]
-
-    class Boom(AnimatedSprite):
-        img = load_image('boom.png')
-        sheet = pygame.transform.scale(img, (WIDTH * 8, HEIGHT * 8))
-
-        def __init__(self, x, y):
-            super().__init__(x, y, self.__class__.sheet, 8, 8,
-                             count_frames=41)
-
-    if __name__ == '__main__':
-        pygame.display.set_caption('Взрыв')
-        clock = pygame.time.Clock()
-        all_sprites = pygame.sprite.Group()
-        Boom(20, 20)
-        for _ in range(40):
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.QUIT:
-                    break
-            screen.fill(BACK_COLOR)
-            all_sprites.update()
-            all_sprites.draw(screen)
-            pygame.display.flip()
-            clock.tick(FPS)
-    FPS = 60
-
-
 def terminate():
-    terminate_animation()
+    animatioms_by_Зинич_Константин_Дмитриевич.amimatioms.terminate_animation()
     pygame.quit()
     sys.exit()
 
@@ -488,7 +262,7 @@ class Player(pygame.sprite.Sprite):
                             f_out.close()
                         terminate()
                     elif tiles == ['Ps']:
-                        spase()  # Запуск кода
+                        mini_game_by_Глеб_Валеахметов_Русланович.mimi_games.asteroids_clasic()
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     player.move(0, -1)
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
