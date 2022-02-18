@@ -6,6 +6,7 @@ from random import randrange as rnd
 
 tk = Tk()
 SIZE = WIDTH, HEIGHT = tk.winfo_screenwidth(), tk.winfo_screenheight()
+Life = 3
 FPS = 60
 STARS_COUNT = 300
 METEORIT_COUNT = 10
@@ -138,6 +139,7 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
+life = pygame.image.load('life.png')
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
@@ -180,14 +182,19 @@ while running:
         all_sprites.add(m)
         mobs.add(m)
 
-    # Проверка, не ударил ли моб игрока
-    hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask)
+    # Проверка, не ударил ли моб игрока и работа жизней
+    hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_mask)
     if hits:
+        Life -= 1
+
+    if Life == 0:
         running = False
 
     # Рендеринг
     screen.fill(BLACK)
     all_sprites.draw(screen)
+    for n in range(Life):
+        screen.blit(life, (10 + n * 45, 800))
     # После отрисовки всего, переворачиваем экран
     pygame.display.flip()
 
